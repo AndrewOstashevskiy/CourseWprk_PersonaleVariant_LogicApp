@@ -11,7 +11,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "MESSAGE", schema = "PUBLIC")
 public class Message {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
