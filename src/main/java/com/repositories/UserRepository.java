@@ -1,11 +1,11 @@
 package com.repositories;
 
-import com.domain.UserDetails;
+import com.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-public interface UserRepository extends JpaRepository<UserDetails, UUID> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-    UserDetails findByUserName(String userName);
+    User findByUsername(String username);
 }

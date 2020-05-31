@@ -1,7 +1,7 @@
 package com.controllers;
 
 import com.domain.Role;
-import com.domain.UserDetails;
+import com.domain.User;
 import com.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -11,29 +11,31 @@ import java.util.Collections;
 import java.util.Map;
 
 @Controller
+@RequestMapping(value = "/reg")
 @RequiredArgsConstructor
 public class RegistrationController {
 
     private final UserRepository userRepository;
 
-    @GetMapping("/reg")
+    @GetMapping
     public String getRegisterPage() {
         return "registration";
     }
 
-    @PostMapping("/reg")
-    public String addUser(UserDetails user, Map<String, Object> message) {
-        UserDetails userFromDb = userRepository.findByUserName(user.getUserName());
+    @PostMapping
+    public String addUser(User user,
+                          Map<String, Object> message) {
+        User userFromDb = userRepository.findByUsername(user.getUsername());
 
         if (userFromDb != null) {
-            message.put("message", "User already exist");
+            message.put("regStatusMessage", "User already exist");
             return "registration";
         }
         user.setActive(true);
         user.setRoles(Collections.singleton(Role.USER));
 
         userRepository.save(user);
-        message.put("message", "Registration success");
-        return "/registration";
+        message.put("regStatusMessage", "Registration success");
+        return "registration";
     }
 }
