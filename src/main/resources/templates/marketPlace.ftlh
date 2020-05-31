@@ -27,7 +27,9 @@
         </#if>
     </#if>
 
-
+<div class="float-right mt-5">
+    ${message!" "}
+</div>
     <table class="table mt-5">
         <thead class="thead-dark">
         <tr scope="row">

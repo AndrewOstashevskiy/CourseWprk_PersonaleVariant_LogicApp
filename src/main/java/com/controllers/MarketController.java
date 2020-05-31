@@ -10,7 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -23,8 +22,7 @@ public class MarketController {
 
     @GetMapping
     public String marketPlace(@AuthenticationPrincipal User user, Model model) {
-        Iterable<Product> products;
-        products = filterForUser(user);
+        Iterable<Product> products = filterForUser(user);
         model.addAttribute("products", products);
         model.addAttribute("user", user);
         return "marketPlace";
@@ -69,7 +67,14 @@ public class MarketController {
     }
 
     @RequestMapping(value = "/buy/{item}", method = RequestMethod.GET)
-    public String buyItem(@PathVariable Product item, @AuthenticationPrincipal User user) {
+    public String buyItem(@PathVariable Product item, @AuthenticationPrincipal User user, Model model) {
+
+        if (item.getStatus().equals(ItemStatus.SOLD)) {
+            Iterable<Product> products = filterForUser(user);
+            model.addAttribute("message", "Item already sold");
+            model.addAttribute("products", products);
+            return "marketPlace";
+        }
 
         Product newItem = Product.builder()
                 .sold(false)
