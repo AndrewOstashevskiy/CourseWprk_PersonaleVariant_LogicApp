@@ -3,7 +3,9 @@ package com.controllers;
 import com.domain.ItemStatus;
 import com.domain.Product;
 import com.domain.User;
+import com.domain.UserBalance;
 import com.repositories.ProductRepository;
+import com.repositories.UserBalanceRepo;
 import com.servise.FiltrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import java.util.Map;
 public class GreetingController {
 
     private final ProductRepository productRepository;
+    private final UserBalanceRepo userBalanceRepo;
     private final FiltrationService filtrationService;
 
     @RequestMapping(value = "/user-page", method = {RequestMethod.GET, RequestMethod.POST})
@@ -29,11 +32,13 @@ public class GreetingController {
         Iterable<Product> productsForSale = filtrationService.filtrateForUser(filter, user);
         Iterable<Product> productsSelling = productRepository.getAllInSelling(user);
         Iterable<Product> soldProducts = productRepository.findByOldOwnerAndSoldTrue(user.getId());
+        double balance = userBalanceRepo.findByUserId(user).getBalance();
 
         model.put("productsForSale", productsForSale);
         model.put("productsSelling", productsSelling);
         model.put("soldProducts", soldProducts);
         model.put("filter", filter);
+        model.put("balance", balance);
         model.put("user", user);
 
         return "main";

@@ -1,16 +1,16 @@
 package com.controllers;
 
-import com.domain.ItemStatus;
-import com.domain.Product;
-import com.domain.Role;
-import com.domain.User;
+import com.domain.*;
 import com.repositories.ProductRepository;
+import com.repositories.UserBalanceRepo;
+import com.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Map;
 
 @Controller
@@ -19,6 +19,8 @@ import java.util.Map;
 public class MarketController {
 
     private final ProductRepository productRepository;
+    private final UserBalanceRepo userBalanceRepo;
+    private final UserRepository userRepository;
 
     @GetMapping
     public String marketPlace(@AuthenticationPrincipal User user, Model model) {
@@ -68,10 +70,11 @@ public class MarketController {
 
     @RequestMapping(value = "/buy/{item}", method = RequestMethod.GET)
     public String buyItem(@PathVariable Product item, @AuthenticationPrincipal User user, Model model) {
+        User oldUser = userRepository.getOne(item.getOldOwner());
 
         if (item.getStatus().equals(ItemStatus.SOLD)) {
             Iterable<Product> products = filterForUser(user);
-            model.addAttribute("message", "Item already sold");
+            model.addAttribute("message", "Sorry... Item already sold");
             model.addAttribute("products", products);
             return "marketPlace";
         }
@@ -87,6 +90,16 @@ public class MarketController {
                 .date(LocalDateTime.now())
                 .status(ItemStatus.PENDING)
                 .build();
+
+        UserBalance oldUserBalance = userBalanceRepo.findByUserId(oldUser);
+        double old = oldUserBalance.getBalance();
+        oldUserBalance.setBalance(old + item.getPrice());
+
+        UserBalance thisUserBalance = userBalanceRepo.findByUserId(user);
+        double thisBalance = thisUserBalance.getBalance();
+        thisUserBalance.setBalance(thisBalance - newItem.getPrice());
+
+        userBalanceRepo.saveAll(Arrays.asList(oldUserBalance, thisUserBalance));
 
         item.setSold(true);
         item.setPlaced(false);

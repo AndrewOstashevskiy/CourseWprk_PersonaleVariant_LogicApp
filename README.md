@@ -1,2 +1,2 @@
 # LogicApp
-Some h....
+Simple trading platform functionality simulation.

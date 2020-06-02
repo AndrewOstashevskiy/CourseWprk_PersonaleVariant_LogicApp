@@ -27,7 +27,7 @@
         </#if>
     </#if>
 
-<div class="float-right mt-5">
+<div class="float-right text-danger mt-5">
     ${message!" "}
 </div>
     <table class="table mt-5">
@@ -54,7 +54,8 @@
                 <td>
                     <#if user.roles?seq_contains("USER")>
                     <form method="get" action="/market/buy/${product.id}" class="form-inline">
-                        <button type="submit">Buy</button>
+                        <button type="submit" class="btn btn-outline-primary">Buy</button>
+
                     </form>
                     </#if>
                 </td>

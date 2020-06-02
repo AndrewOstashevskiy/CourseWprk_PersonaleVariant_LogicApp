@@ -2,6 +2,8 @@ package com.controllers;
 
 import com.domain.Role;
 import com.domain.User;
+import com.domain.UserBalance;
+import com.repositories.UserBalanceRepo;
 import com.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,7 @@ import java.util.Map;
 public class RegistrationController {
 
     private final UserRepository userRepository;
+    private final UserBalanceRepo userBalanceRepo;
 
     @GetMapping
     public String getRegisterPage() {
@@ -33,8 +36,13 @@ public class RegistrationController {
         }
         user.setActive(true);
         user.setRoles(Collections.singleton(Role.USER));
-
         userRepository.save(user);
+
+        UserBalance userBalance = UserBalance.builder()
+                .userId(user)
+                .balance(1000)
+                .build();
+        userBalanceRepo.save(userBalance);
         message.put("regStatusMessage", "Registration success");
         return "registration";
     }
