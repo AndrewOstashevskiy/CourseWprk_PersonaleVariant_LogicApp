@@ -18,7 +18,7 @@
     <footer class="blockquote-footer mb-5">Your balance:
         <cite title="Source Title">
             ${balance}
-        </cite>$
+        </cite> btc
     </footer>
     <div class="container">
         <div class="text-center mb-2">My actions for sales</div>

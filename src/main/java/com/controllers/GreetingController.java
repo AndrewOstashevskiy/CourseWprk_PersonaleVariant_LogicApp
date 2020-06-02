@@ -1,49 +1,29 @@
 package com.controllers;
 
-import com.domain.ItemStatus;
 import com.domain.Product;
 import com.domain.User;
-import com.domain.UserBalance;
-import com.repositories.ProductRepository;
-import com.repositories.UserBalanceRepo;
-import com.servise.FiltrationService;
+import com.services.GreetingService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
 public class GreetingController {
 
-    private final ProductRepository productRepository;
-    private final UserBalanceRepo userBalanceRepo;
-    private final FiltrationService filtrationService;
+    private final GreetingService greetingService;
 
     @RequestMapping(value = "/user-page", method = {RequestMethod.GET, RequestMethod.POST})
     public String getFromMainPage(@RequestParam(required = false) String filter,
                                   Map<String, Object> model,
                                   @AuthenticationPrincipal User user) {
-        Iterable<Product> productsForSale = filtrationService.filtrateForUser(filter, user);
-        Iterable<Product> productsSelling = productRepository.getAllInSelling(user);
-        Iterable<Product> soldProducts = productRepository.findByOldOwnerAndSoldTrue(user.getId());
-        double balance = userBalanceRepo.findByUserId(user).getBalance();
-
-        model.put("productsForSale", productsForSale);
-        model.put("productsSelling", productsSelling);
-        model.put("soldProducts", soldProducts);
-        model.put("filter", filter);
-        model.put("balance", balance);
-        model.put("user", user);
-
+        greetingService.setDataForMainPage(filter, model, user);
         return "main";
     }
-
 
 
     @GetMapping("/user-page/{item}")
@@ -54,15 +34,10 @@ public class GreetingController {
 
     @GetMapping("/user-page/place/{item}")
     public String placeForSelling(@AuthenticationPrincipal User user, @PathVariable Product item) {
-
-        item.setPlaced(true);
-        item.setOldOwner(user.getId());
-        item.setDate(LocalDateTime.now());
-        item.setStatus(ItemStatus.ACTIVE);
-
-        productRepository.save(item);
+        greetingService.placeForSelling(user, item);
         return "redirect:/user-page";
     }
+
 
     @PostMapping("/user-page/update")
     public String updateItem(@RequestParam Map<String, String> form,
@@ -70,16 +45,10 @@ public class GreetingController {
                              Model model) {
 
         if (product.isSold()) {
-            model.addAttribute("msg", "Action is already sold");
-            model.addAttribute("item", product);
+            greetingService.setErrorMessage(product, model);
             return "itemEditor";
         }
-        product.setDomain(form.get("domain"));
-        product.setDescription(form.get("description"));
-        product.setDate(LocalDateTime.now());
-        product.setPrice(Double.valueOf(form.get("price")));
-
-        productRepository.save(product);
+        greetingService.updateExistingProduct(form, product);
         return "redirect:/user-page";
     }
 }

@@ -1,18 +1,15 @@
 package com.controllers;
 
-import com.domain.Role;
 import com.domain.User;
 import com.repositories.UserRepository;
+import com.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user")
@@ -21,6 +18,7 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @GetMapping
     public String userList(Model model) {
@@ -30,32 +28,20 @@ public class UserController {
 
     @GetMapping("{user}")
     public String userEditForm(@PathVariable User user, Model model) {
-        model.addAttribute("user", user);
-        model.addAttribute("roles", Role.values());
+        userService.setDataForUserEditForm(user, model);
         return "userEdit";
     }
+
+
 
     @PostMapping
     public String userSave(@RequestParam Map<String, String> form,
                            @RequestParam("userId") User user
                            ) {
 
-        user.getRoles().clear();
-        user.setUsername(form.get("username"));
-        Set<String> roles = Arrays.stream(Role.values())
-                .map(Role::name)
-                .collect(Collectors.toSet());
-
-        form.keySet().forEach(s -> {
-            if (roles.contains(s)) {
-                user.getRoles().add(Role.valueOf(s));
-            }
-        });
-
-        if (user.getRoles().isEmpty()) {
-            user.getRoles().add(Role.USER);
-        }
-        userRepository.save(user);
+        userService.editUserData(form, user);
         return "redirect:/user";
     }
+
+
 }

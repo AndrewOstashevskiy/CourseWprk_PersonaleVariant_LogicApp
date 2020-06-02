@@ -1,16 +1,14 @@
 package com.controllers;
 
 import com.domain.*;
-import com.repositories.ProductRepository;
-import com.repositories.UserBalanceRepo;
-import com.repositories.UserRepository;
+
+import com.services.MarketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDateTime;
-import java.util.Arrays;
+
 import java.util.Map;
 
 @Controller
@@ -18,26 +16,19 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MarketController {
 
-    private final ProductRepository productRepository;
-    private final UserBalanceRepo userBalanceRepo;
-    private final UserRepository userRepository;
+    private final MarketService marketService;
 
     @GetMapping
     public String marketPlace(@AuthenticationPrincipal User user, Model model) {
-        Iterable<Product> products = filterForUser(user);
-        model.addAttribute("products", products);
-        model.addAttribute("user", user);
+        marketService.setDataToMarketPage(user, model);
         return "marketPlace";
     }
 
-    private Iterable<Product> filterForUser(@AuthenticationPrincipal User user) {
-        Iterable<Product> products;
-        if (user.getRoles().contains(Role.ADMIN)) {
-            products = productRepository.selectAllExceptPending();
-        } else {
-            products = productRepository.findProductsAvailableToBuy(user, false);
-        }
-        return products;
+    @PostMapping("/generate")
+    public String generate(@AuthenticationPrincipal User user, Model model) {
+        marketService.generateRandomData(user);
+        marketService.setDataToMarketPage(user, model);
+        return "marketPlace";
     }
 
     @PostMapping("/add")
@@ -47,68 +38,20 @@ public class MarketController {
                                          @RequestParam String price,
                                          Map<String, Object> map
     ) {
-        Product product = Product.builder()
-                .description(description)
-                .domain(domain)
-                .price(Double.valueOf(price))
-                .oldOwner(user.getId())
-                .owner(user)
-                .date(LocalDateTime.now())
-                .sold(false)
-                .placed(true)
-                .status(ItemStatus.ACTIVE)
-
-                .build();
-        productRepository.save(product);
-
-        Iterable<Product> products = productRepository.findAll();
-
-        map.put("products", products);
-        map.put("user", user);
+        marketService.createProductAndSetDataForPage(user, description, domain, price, map);
         return "redirect:/market";
     }
 
+
     @RequestMapping(value = "/buy/{item}", method = RequestMethod.GET)
     public String buyItem(@PathVariable Product item, @AuthenticationPrincipal User user, Model model) {
-        User oldUser = userRepository.getOne(item.getOldOwner());
-
         if (item.getStatus().equals(ItemStatus.SOLD)) {
-            Iterable<Product> products = filterForUser(user);
-            model.addAttribute("message", "Sorry... Item already sold");
-            model.addAttribute("products", products);
+            marketService.setErrorMessageWithData(user, model);
             return "marketPlace";
         }
-
-        Product newItem = Product.builder()
-                .sold(false)
-                .placed(false)
-                .oldOwner(item.getOwner().getId())
-                .owner(user)
-                .description(item.getDescription())
-                .domain(item.getDomain())
-                .price(item.getPrice())
-                .date(LocalDateTime.now())
-                .status(ItemStatus.PENDING)
-                .build();
-
-        UserBalance oldUserBalance = userBalanceRepo.findByUserId(oldUser);
-        double old = oldUserBalance.getBalance();
-        oldUserBalance.setBalance(old + item.getPrice());
-
-        UserBalance thisUserBalance = userBalanceRepo.findByUserId(user);
-        double thisBalance = thisUserBalance.getBalance();
-        thisUserBalance.setBalance(thisBalance - newItem.getPrice());
-
-        userBalanceRepo.saveAll(Arrays.asList(oldUserBalance, thisUserBalance));
-
-        item.setSold(true);
-        item.setPlaced(false);
-        item.setOwner(user);
-        item.setStatus(ItemStatus.SOLD);
-
-        productRepository.save(item);
-        productRepository.save(newItem);
-
+        marketService.buyItem(item, user);
         return "redirect:/user-page";
     }
+
+
 }

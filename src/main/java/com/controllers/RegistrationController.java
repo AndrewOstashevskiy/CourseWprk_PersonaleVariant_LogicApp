@@ -1,15 +1,11 @@
 package com.controllers;
 
-import com.domain.Role;
 import com.domain.User;
-import com.domain.UserBalance;
-import com.repositories.UserBalanceRepo;
-import com.repositories.UserRepository;
+import com.services.RegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.Map;
 
 @Controller
@@ -17,8 +13,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RegistrationController {
 
-    private final UserRepository userRepository;
-    private final UserBalanceRepo userBalanceRepo;
+   private final RegistrationService registrationService;
 
     @GetMapping
     public String getRegisterPage() {
@@ -28,22 +23,19 @@ public class RegistrationController {
     @PostMapping
     public String addUser(User user,
                           Map<String, Object> message) {
-        User userFromDb = userRepository.findByUsername(user.getUsername());
 
-        if (userFromDb != null) {
+        boolean isUserAvailable = registrationService.isUserAvailable(user);
+        if (isUserAvailable) {
             message.put("regStatusMessage", "User already exist");
             return "registration";
         }
-        user.setActive(true);
-        user.setRoles(Collections.singleton(Role.USER));
-        userRepository.save(user);
-
-        UserBalance userBalance = UserBalance.builder()
-                .userId(user)
-                .balance(1000)
-                .build();
-        userBalanceRepo.save(userBalance);
-        message.put("regStatusMessage", "Registration success");
+        if (user.getUsername().isEmpty() || user.getUsername().trim().isEmpty()) {
+            message.put("regStatusMessage", "I see everything. Don't cheating!!!! Input valid name mr. Masson");
+            return "registration";
+        }
+        registrationService.createUser(user, message);
         return "registration";
     }
+
+
 }

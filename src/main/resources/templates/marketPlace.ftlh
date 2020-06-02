@@ -3,6 +3,11 @@
 
 <@c.page>
     MarketPlace
+    <footer class="blockquote-footer mb-5">Your balance:
+        <cite title="Source Title">
+            ${balance}
+        </cite> btc
+    </footer>
 
     <#if user.roles?seq_contains("ADMIN")>
         <#if name != "undefinded">
@@ -24,10 +29,16 @@
                     </div>
                 </div>
             </div>
+            <div>
+                <form method="post" action="/market/generate" class="form-inline">
+                    <input type="hidden" name="_csrf" value="${_csrf.token}"/>
+                    <button type="submit" class="btn btn-primary ml-3">Generate Data</button>
+                </form>
+            </div>
         </#if>
     </#if>
 
-<div class="float-right text-danger mt-5">
+<div class="float-righttext-danger mt-5">
     ${message!" "}
 </div>
     <table class="table mt-5">
