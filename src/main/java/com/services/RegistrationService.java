@@ -21,7 +21,7 @@ public class RegistrationService {
     public void createUser(User user, Map<String, Object> message) {
 
         user.setActive(true);
-        if (user.getUsername().equals("a")) {
+        if (user.getUsername().equals("Admin")) {
             user.setRoles(Collections.singleton(Role.ADMIN));
         } else {
             user.setRoles(Collections.singleton(Role.USER));
@@ -37,11 +37,11 @@ public class RegistrationService {
     }
 
     public boolean isUserAvailable(User user) {
-        User userFromDb = userRepository.findByUsername(user.getUsername());
+        User userFromDb = userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword());
 
         if (userFromDb != null) {
             return true;
         }
-        return false;
+         return false;
     }
 }

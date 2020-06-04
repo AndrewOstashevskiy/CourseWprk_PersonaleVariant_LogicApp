@@ -15,7 +15,8 @@ public class FiltrationService {
 
     private final ProductRepository productRepository;
 
-    public Iterable<Product> filtrateForUser(@RequestParam(required = false) String filter, @AuthenticationPrincipal User user) {
+    public Iterable<Product> filtrateForUser(@RequestParam(required = false) String filter,
+                                             @AuthenticationPrincipal User user) {
         Iterable<Product> productsForSale;
         if (filter == null || filter.isEmpty()) {
             productsForSale = productRepository.findByOwnerAndStatus(user, ItemStatus.PENDING);

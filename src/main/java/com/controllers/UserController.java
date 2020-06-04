@@ -5,6 +5,7 @@ import com.repositories.UserRepository;
 import com.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +22,11 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public String userList(Model model) {
-        model.addAttribute("users", userRepository.findAll());
+    public String userList(@AuthenticationPrincipal User user, Model model) {
+        model.addAttribute("users", userRepository.
+                findAllByUsernameIsNotAndPasswordIsNot(
+                user.getUsername(),
+                user.getPassword()));
         return "userList";
     }
 

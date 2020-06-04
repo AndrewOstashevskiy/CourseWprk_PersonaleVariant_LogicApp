@@ -2,12 +2,12 @@
 
 <@c.page>
     <div>Users list:</div>
-    <table>
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Role</th>
-            <th></th>
+    <table class="table">
+        <thead class="thead-dark">
+        <tr scope ="row">
+            <th scope="col">Name</th>
+            <th scope="col">Role</th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>

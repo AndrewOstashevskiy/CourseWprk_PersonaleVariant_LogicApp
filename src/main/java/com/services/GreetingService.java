@@ -47,6 +47,16 @@ public class GreetingService {
         productRepository.save(item);
     }
 
+    public void stopSelling(User user, Product item) {
+        item.setPlaced(false);
+        item.setSold(false);
+        item.setOldOwner(user.getId());
+        item.setDate(LocalDateTime.now());
+        item.setStatus(ItemStatus.PENDING);
+
+        productRepository.save(item);
+    }
+
     public void setErrorMessage(@RequestParam("id") Product product, Model model) {
         model.addAttribute("msg", "Action is already sold");
         model.addAttribute("item", product);

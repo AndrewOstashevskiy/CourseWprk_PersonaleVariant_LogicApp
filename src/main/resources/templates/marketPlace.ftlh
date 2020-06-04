@@ -29,7 +29,7 @@
                     </div>
                 </div>
             </div>
-            <div>
+            <div class="mt-2">
                 <form method="post" action="/market/generate" class="form-inline">
                     <input type="hidden" name="_csrf" value="${_csrf.token}"/>
                     <button type="submit" class="btn btn-primary ml-3">Generate Data</button>
@@ -38,10 +38,10 @@
         </#if>
     </#if>
 
-<div class="float-righttext-danger mt-5">
+<div class="float-right text-danger mt-5">
     ${message!" "}
 </div>
-    <table class="table mt-5">
+    <table class="table mt-1">
         <thead class="thead-dark">
         <tr scope="row">
             <th scope="col">Action's domain</th>

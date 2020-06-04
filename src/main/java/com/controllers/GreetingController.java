@@ -33,11 +33,17 @@ public class GreetingController {
     }
 
     @GetMapping("/user-page/place/{item}")
-    public String placeForSelling(@AuthenticationPrincipal User user, @PathVariable Product item) {
+    public String placeForSelling(@AuthenticationPrincipal User user,
+                                  @PathVariable Product item) {
         greetingService.placeForSelling(user, item);
         return "redirect:/user-page";
     }
 
+    @GetMapping("/user-page/stop/{item}")
+    public String stopSelling(@AuthenticationPrincipal User user, @PathVariable Product item) {
+        greetingService.stopSelling(user, item);
+        return "redirect:/user-page";
+    }
 
     @PostMapping("/user-page/update")
     public String updateItem(@RequestParam Map<String, String> form,

@@ -13,7 +13,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RegistrationController {
 
-   private final RegistrationService registrationService;
+    private final RegistrationService registrationService;
 
     @GetMapping
     public String getRegisterPage() {
@@ -29,8 +29,11 @@ public class RegistrationController {
             message.put("regStatusMessage", "User already exist");
             return "registration";
         }
-        if (user.getUsername().isEmpty() || user.getUsername().trim().isEmpty()) {
-            message.put("regStatusMessage", "I see everything. Don't cheating!!!! Input valid name mr. Masson");
+        if (user.getUsername().isEmpty()
+                || user.getUsername().trim().isEmpty()
+                || user.getPassword().isEmpty()
+                || user.getPassword().trim().isEmpty()) {
+            message.put("regStatusMessage", "I see everything. Don't cheating!!!! Input a valid name mr. Masson");
             return "registration";
         }
         registrationService.createUser(user, message);

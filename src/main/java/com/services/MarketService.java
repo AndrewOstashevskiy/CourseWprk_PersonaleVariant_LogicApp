@@ -74,10 +74,18 @@ public class MarketService {
                 .build();
     }
 
-    public void setErrorMessageWithData(@AuthenticationPrincipal User user, Model model) {
-        Iterable<Product> products = filterForUser(user);
-        model.addAttribute("message", "Sorry... Item already sold");
-        model.addAttribute("products", products);
+    public void setErrorMessageWithData(Model model, ErrorDomain error) {
+        switch (error) {
+            case ALREADY_SOLD: {
+                model.addAttribute("message", "Sorry... Item already sold");
+            }
+            break;
+            case BALANCE_ERROR: {
+                model.addAttribute("message", "Check your balance please");
+            }
+            break;
+            default: throw new IllegalStateException();
+        }
     }
 
     public void buyItem(@PathVariable Product item, @AuthenticationPrincipal User user) {
@@ -139,7 +147,7 @@ public class MarketService {
     public void generateRandomData(User user) {
         List<String> domains = Arrays.asList("GOG", "AWS", "RB", "APP");
         List<String> desc = Arrays.asList("Google", "Amazon", "Ruby", "Apple");
-        for (int i = 0; i < domains.size() ; i++) {
+        for (int i = 0; i < domains.size(); i++) {
             for (int j = 0; j < 10; j++) {
                 Product product = Product.builder()
                         .description(desc.get(i))

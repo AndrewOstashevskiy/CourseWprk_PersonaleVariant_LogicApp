@@ -10,12 +10,6 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            <#if name != "undefinded">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
-                </li>
-            </#if>
-
             <#if known>
                 <#if user.roles?seq_contains("USER")>
                     <#if name != "undefinded">
