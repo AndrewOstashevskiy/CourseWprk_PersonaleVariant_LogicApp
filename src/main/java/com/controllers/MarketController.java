@@ -46,11 +46,17 @@ public class MarketController {
     @RequestMapping(value = "/buy/{item}", method = RequestMethod.GET)
     public String buyItem(@PathVariable Product item, @AuthenticationPrincipal User user, Model model) {
         if (item.getStatus().equals(ItemStatus.SOLD)) {
-            marketService.setErrorMessageWithData(user, model);
+            marketService.setErrorMessageWithData(model, ErrorDomain.ALREADY_SOLD);
+            marketService.setDataToMarketPage(user, model);
             return "marketPlace";
+        } else if (user.getBalance().getBalance() < item.getPrice()) {
+            marketService.setErrorMessageWithData(model, ErrorDomain.BALANCE_ERROR);
+            marketService.setDataToMarketPage(user, model);
+            return "marketPlace";
+        } else {
+            marketService.buyItem(item, user);
+            return "redirect:/user-page";
         }
-        marketService.buyItem(item, user);
-        return "redirect:/user-page";
     }
 
 

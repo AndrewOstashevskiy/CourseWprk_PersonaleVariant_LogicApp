@@ -3,6 +3,6 @@
 
 <@c.page>
     Registration
-    <div>  ${regStatusMessage!""}</div>
     <@l.login "/reg" "Sign Up" />
+    <div class="mt-3">  ${regStatusMessage!""}</div>
 </@c.page>

@@ -73,6 +73,7 @@
                 <th scope="col">Price</th>
                 <th scope="col">Status</th>
                 <th scope="col"></th>
+                <th scope="col"></th>
             </tr>
             </thead>
             <tbody>
@@ -85,6 +86,13 @@
                     <td>${product.price}</td>
                     <td>${product.status}</td>
                     <td><a href="/user-page/${product.id}">Edit</a></td>
+                    <td>
+                        <#if user.roles?seq_contains("USER")>
+                            <form method="get" action="/user-page/stop/${product.id}" class="form-inline">
+                                <button type="submit" class="btn btn-outline-primary">Stop</button>
+                            </form>
+                        </#if>
+                    </td>
                 </tr>
             <#else>
                 No elements

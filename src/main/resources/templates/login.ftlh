@@ -2,6 +2,7 @@
 <#import "parts/login.ftlh" as l>
 
 <@c.page>
-    Login In
-<@l.login "/login" "Log In" />
+    <div class="text mb-2">Logination</div>
+    <div><@l.login "/login" "Log In" /></div>
+    <div class="text-danger mt-2">${errorMessage! " "}</div>
 </@c.page>
